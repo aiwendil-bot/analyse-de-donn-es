@@ -1,12 +1,16 @@
 #install.packages("funModeling")
 #install.packages("VIM")
 #install.packages("naniar")
+#install.packages("explor")
+#install.packages("shiny")
+#install.packages("FactoMiner")
 
-library(VIM)
-library(funModeling)
+
 library(naniar)
 
-table<-read.csv("/home/adrien/analyse de données/Table_Ciqual.csv", sep=';',fileEncoding="latin1") #import table
+#VISUALISATION DES DONNEES MANQUANTES
+
+table <-read.csv("/home/adrien/analyse de données/Table_Ciqual.csv", sep=';',fileEncoding="latin1") #import table
 
 fromages<-subset(table, alim_ssgrp_nom_fr == "fromages et assimilés") #restriction aux fromages et assimilés
 fromages <- fromages[-1,] # On supprime la 1ere ligne (fromage "moyen")
