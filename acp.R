@@ -5,21 +5,24 @@
 #library(funModeling)
 library(missMDA)
 library(plotrix)
-dataset <-read.csv("/home/adrien/analyse de données/Table_Ciqual.csv", sep=';',fileEncoding="latin1", header=TRUE,dec=",",na.strings = c("-","")) #import table
+dataset <-read.csv("/home/adrien/analyse de données/Table_Ciqual.csv", sep=';',fileEncoding="latin1", header=TRUE,dec=",",na.strings = c("-",""))[-1,] #import table
 dataset.fromages <- subset(dataset, alim_ssgrp_nom_fr == "fromages et assimilés") #restriction aux fromages et assimilés
 #enlever fromages avec trop de données manquantes (>50%) et variables non quantitatives & vitamine K2
+rownames(dataset.fromages) <- dataset.fromages[,8]
 dataset.fromages <- dataset.fromages[,c(-9:-1,-30,-68)] #non quantitatives, vitamine K2 et alcool (que des 0)
 
-dataset.fromages.clean <- dataset.fromages[c(-2, -7, -8, -12, -14, -15, -29, -36, -39, -40, -57, -63, -65, -79, -88, -90, -94, -97, -99, -104, -107, -108, -109),]
+dataset.fromages.clean <- dataset.fromages[c(-2, -7, -8, -12, -14, -15, -29, -36, -39, -40, -57, -63, -65, -79, -88, -90, -94, -97, -99, -104, -107, -108, -109,-134),]
+#print(dim(dataset.fromages))
+#fromage 111 = particulier
 #summary(dataset.fromages.clean)
 #nb = estim_ncpPCA(dataset.fromages.clean)
 #nb
 
 #sapply(dataset,class)
 #dim(dataset.fromages.clean)
-dataset.fromages.clean.impute <- imputePCA(dataset.fromages.clean)[[2]]
-colnames(dataset.fromages.clean.impute) = colnames(dataset.fromages.clean )
-rownames(dataset.fromages.clean.impute) = rownames(dataset.fromages.clean )
+#dataset.fromages.clean.impute <- imputePCA(dataset.fromages.clean)[[2]]
+#colnames(dataset.fromages.clean.impute) = colnames(dataset.fromages.clean )
+#rownames(dataset.fromages.clean.impute) = rownames(dataset.fromages.clean )
 #dataset.fromages.clean.impute
 #ACP FactoMiner
 #pca=PCA(dataset.fromages.clean)
@@ -127,9 +130,24 @@ cercle_correlations = function(X){
 
 F = function(X){
   X <- scale(X)
-  Ft = X %*% vectp(X)
-  colnames(Ft) = numeros(X)[1:nb_vp(X)]
-  return(Ft)
+  f = X %*% vectp(X)
+  colnames(f) = numeros(X)[1:nb_vp(X)]
+  return(f)
 }
 
-F(dataset.fromages.clean.impute)
+graphe_individus = function(X){
+  # Définition titre, noms des axes, cadrillage et placement des points
+  plot.new()
+  dev.new(width = 30,
+        height = 30)
+  plot(F(X)[,1],F(X)[,2],type="p",xlab=paste("Dim.1 (",ACP_vp(X)[1,2],"%)"),ylab=paste("Dim.2 (",ACP_vp(X)[2,2],"%)"),asp=1)
+  grid()
+  title("Graphe des individus")
+  text(F(X)[,1],F(X)[,2],labels = row.names(X),cex=1,col="red")
+  # On trace les deux axes centrés en l'origine
+  abline(h = 0,lty=2)
+  abline(v = 0,lty=2)
+}
+
+print(dataset.fromages.clean)
+#print(dataset.fromages.clean.impute)
